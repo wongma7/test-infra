@@ -136,6 +136,12 @@ def main(args):
         ])
     regions = ','.join([zone[:-1] for zone in zones.split(',')])
 
+    e2e_opt = ('--kops-cluster %s --kops-zones %s --kops-state %s '
+               '--kops-nodes=%s --kops-ssh-key=%s ' %
+               (args.cluster, zones, args.state, args.nodes, aws_ssh))
+    if args.image:
+        e2e_opt += '--kops-image=%s' % args.image
+
     cmd.extend([
       # Boilerplate envs
       # Jenkins required variables
@@ -148,11 +154,7 @@ def main(args):
       '-e', 'E2E_TEST=%s' % args.test,
       '-e', 'E2E_DOWN=%s' % args.down,
       # Kops
-      '-e', ('E2E_OPT=--kops-cluster %s --kops-zones %s '
-             '--kops-state %s --kops-nodes=%s --kops-ssh-key=%s '
-             '--kops-image=%s' %
-             (args.cluster, zones, args.state, args.nodes, aws_ssh,
-              args.image)),
+      '-e', 'E2E_OPT=%s' % e2e_opt,
     ])
 
     # env blacklist.
